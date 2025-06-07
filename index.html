@@ -1,133 +1,667 @@
-<!DOCTYPE html><html lang="ar">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لعبة الشخصية السرية</title>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #222; color: #fff; text-align: center; direction: rtl; padding: 20px; }
-    h1 { color: #ffcc00; }
-    input, button, select { padding: 10px; margin: 5px; font-size: 1em; border-radius: 5px; border: none; }
-    button { background: #007acc; color: #fff; cursor: pointer; }
-    button:hover { background: #005fa3; }
-    #hints { margin-top: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; }
-    #hints li { background: #333; padding: 10px; margin: 5px 0; border-radius: 5px; }
-    #scoreBoard { margin-top: 30px; }
-    #scoreBoard table { width: 100%; max-width: 400px; margin: auto; border-collapse: collapse; }
-    #scoreBoard th, #scoreBoard td { border: 1px solid #555; padding: 8px; }
-    #scoreBoard th { background: #007acc; }
-    #timer { margin-top: 20px; font-size: 1.2em; }
+    /* متغيرات الألوان */
+    :root {
+      --primary: #2c3e50;
+      --secondary: #3498db;
+      --accent: #e74c3c;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --dark: #1a1a2e;
+      --light: #f5f5f5;
+      --text: #333;
+      --card-bg: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    /* إعادة الضبط الأساسية */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, var(--dark), #16213e);
+      color: var(--light);
+      line-height: 1.6;
+      padding: 0;
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    .container {
+      max-width: 100%;
+      padding: 15px;
+      margin: 0 auto;
+    }
+
+    /* الترويسة */
+    header {
+      text-align: center;
+      padding: 20px 0;
+      background: rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: var(--warning);
+      margin-bottom: 5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .subtitle {
+      color: #bbb;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+
+    /* بطاقات المحتوى */
+    .card {
+      background: var(--card-bg);
+      color: var(--text);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px var(--shadow);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-title {
+      color: var(--secondary);
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eee;
+    }
+
+    /* أزرار وتحكم */
+    .btn {
+      display: inline-block;
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin: 8px 5px;
+      text-align: center;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .btn-primary {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2980b9;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 8px 15px;
+      font-size: 0.9rem;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+      font-size: 1rem;
+      background: white;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--secondary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    /* تلميحات الشخصية */
+    #characterName {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--warning);
+      margin: 20px 0;
+      text-align: center;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+
+    #hints {
+      list-style: none;
+      margin: 20px 0;
+    }
+
+    #hints li {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid var(--secondary);
+      transition: transform 0.3s;
+      backdrop-filter: blur(5px);
+    }
+
+    #hints li:hover {
+      transform: translateX(-5px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* لوحة النقاط */
+    #scoreBoard {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: center;
+    }
+
+    thead {
+      background: var(--secondary);
+      color: white;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* المؤقت */
+    #timerDisplay {
+      font-size: 3rem;
+      font-weight: bold;
+      color: var(--warning);
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    /* فريق التطوير */
+    .developer {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .developer h2 {
+      color: var(--warning);
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    /* إخفاء العناصر */
+    .hidden {
+      display: none;
+    }
+
+    /* التأثيرات والتحريك */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* التجاوب مع الهواتف */
+    @media (min-width: 768px) {
+      .container {
+        max-width: 750px;
+        padding: 20px;
+      }
+      
+      .btn {
+        width: auto;
+      }
+      
+      .flex-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      
+      .flex-row > * {
+        flex: 1;
+        min-width: 200px;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .container {
+        max-width: 970px;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .container {
+        max-width: 1170px;
+      }
+    }
   </style>
 </head>
+<style>
+  #passwordOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom right, #222, #444);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  #passwordBox {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    text-align: center;
+    max-width: 300px;
+    width: 100%;
+    font-family: Arial, sans-serif;
+    color: black; /* ✅ إضافة لون النص الأسود */
+  }
+
+  #passwordBox input[type="password"] {
+    width: 90%;
+    padding: 10px;
+    margin-top: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+
+  #passwordBox button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #e91e63;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  #passwordBox button:hover {
+    background-color: #c2185b;
+  }
+
+  #errorMsg {
+    color: red;
+    margin-top: 10px;
+    display: none;
+    font-size: 14px;
+  }
+</style>
+
+<div id="passwordOverlay">
+  <div id="passwordBox">
+    <h1>🎮 العاب
+      <li>𖤍|𝐑𝐄𝐃𝐒𝐖𝐎𝐑𝐃</li>
+    </h1>
+
+    <h2>🔒 كلمة المرور مطلوبة
+      <li>الرجاء التواصل معنا للحصول على كلمة المرور</li>
+    </h2>
+
+    <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور" />
+    <div id="errorMsg">كلمة المرور غير صحيحة!</div>
+    <button onclick="checkPassword()">دخول</button>
+  </div>
+</div>
+
+<script>
+  const correctPassword = "12345"; // غيّر كلمة المرور هنا
+
+  function checkPassword() {
+    const input = document.getElementById("passwordInput").value;
+    const errorMsg = document.getElementById("errorMsg");
+
+    if (input === correctPassword) {
+      document.getElementById("passwordOverlay").style.display = "none";
+    } else {
+      errorMsg.style.display = "block";
+    }
+  }
+</script>
 <body>
-	<div class="developer">
-    <h2>𖤍 | 𝐑𝐄𝐃𝐒𝐖𝐎𝐑𝐃 & فريق تطوير 𝐒𝐒𝐎</h2>
-    <ul>
-      <li><strong>𖤍 | 𝐑𝐄𝐃𝐒𝐖𝐎𝐑𝐃</strong> –  قائد المشروع_برمجة </li>
-    </ul>
+	
+  <li><strong>𖤍 | 𝐑𝐄𝐃𝐒𝐖𝐎𝐑𝐃</strong>-تطوير</li>
+  
+</ul>
+</div>
+  <div class="container">
+    <header>
+      <h1> العاب
+      <li>𖤍|𝐑𝐄𝐃𝐒𝐖𝐎𝐑𝐃</li>
+      <li>لعبة الشخصية السرية</li>
+
+</h1>
+      <li>---</li>
+      <p class="subtitle">تحدّى معرفتك وافهم الإشارات لتكشف الشخصية!</p>
+    </header>
+
+    <div id="setup" class="fade-in">
+      <div class="card">
+        <h2 class="card-title">إعداد اللعبة</h2>
+        <div class="input-group">
+          <label for="teamCount">عدد الفرق:</label>
+          <input type="number" id="teamCount" value="2" min="2" max="8">
+        </div>
+        <button class="btn btn-primary" onclick="createTeams()">تأكيد</button>
+      </div>
+
+      <div id="teamInputs" class="hidden"></div>
+    </div>
+
+    <div id="gameArea" class="hidden">
+      <div class="card">
+        <h2 class="card-title">الشخصية السرية</h2>
+        <button class="btn btn-primary" onclick="newCharacter()">شخصية جديدة</button>
+        <div id="characterName"></div>
+        <ul id="hints"></ul>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">إدارة الجولة</h2>
+        <div class="input-group">
+          <label for="winnerSelect">الفريق الفائز:</label>
+          <select id="winnerSelect"></select>
+        </div>
+        
+        <div class="flex-row">
+          <button class="btn btn-success" onclick="awardPoints()">احتساب النقاط</button>
+          <button class="btn btn-warning" onclick="penaltyAll()">لا أحد - خصم نقطة</button>
+          <button class="btn btn-primary" onclick="nextRound()" id="nextBtn" style="display:none;">التالي</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">المؤقت</h2>
+        <div class="input-group">
+          <label for="timerInput">مدة الجولة (ثانية):</label>
+          <input type="number" id="timerInput" value="30" min="5" max="300">
+        </div>
+        <button class="btn btn-primary" onclick="startTimer()">ابدأ المؤقت</button>
+        <div id="timerDisplay"></div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">لوحة النتائج</h2>
+        <div id="scoreBoard">
+          <table>
+            <thead>
+              <tr>
+                <th>الفريق</th>
+                <th>النقاط</th>
+              </tr>
+            </thead>
+            <tbody id="scoreRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="developer">
+      <h2>𖤍 | 𝐑𝐄𝐃𝐒𝐖𝐎𝐑𝐃 & فريق تطوير 𝐒𝐒𝐎</h2>
+      <ul>
+        <li><strong>𖤍 | 𝐑𝐄𝐃𝐒𝐖𝐎𝐑𝐃</strong> – قائد المشروع والبرمجة</li>
+      </ul>
+    </div>
   </div>
-  <h1>لعبة الشخصية السرية</h1>
-  <div id="setup">
-    <label>عدد الفرق: <input type="number" id="teamCount" value="2" min="2" max="8"></label>
-    <button onclick="createTeams()">تأكيد</button>
-    <div id="teamInputs"></div>
-  </div>
-  <div id="gameArea" style="display:none;">
-    <button onclick="newCharacter()">شخصية جديدة</button>
-    <div id="characterName" style="margin-top:20px; font-size:1.2em; color:#0f0;"></div>
-    <ul id="hints"></ul>
-    <div>
-      <label for="winnerSelect">الفريق الفائز:</label>
-      <select id="winnerSelect"></select>
-      <button onclick="awardPoints()">احتساب النقاط</button>
-      <button onclick="penaltyAll()">لا أحد - خصم نقطة</button>
-      <button onclick="nextRound()" id="nextBtn" style="display:none;">التالي</button>
-    </div>
-    <div id="timer">
-      مدة الجولة: <input type="number" id="timerInput" value="30" min="5" max="300"> ثانية
-      <button onclick="startTimer()">ابدأ المؤقت</button>
-      <div id="timerDisplay"></div>
-    </div>
-    <div id="scoreBoard">
-      <h3>النقاط</h3>
-      <table>
-        <thead><tr><th>الفريق</th><th>النقاط</th></tr></thead>
-        <tbody id="scoreRows"></tbody>
-      </table>
-    </div>
-  </div><script>
-  let teams = [], scores = [], currentCharacter = null, hintsDB = [];
-  // جلب قاعدة البيانات من ملف خارجي
+
+  <script>
+    let teams = [], scores = [], currentCharacter = null, hintsDB = [];
+    
+     // جلب قاعدة البيانات من ملف خارجي
   fetch('character_hints_100.json')
     .then(res => res.json())
     .then(data => hintsDB = data);
 
-  function createTeams() {
-    const count = +document.getElementById('teamCount').value;
-    const container = document.getElementById('teamInputs');
-    container.innerHTML = '';
-    teams = [];
-    for (let i=0; i<count; i++) {
-      const inp = document.createElement('input'); inp.placeholder = 'اسم الفريق '+(i+1);
-      container.appendChild(inp);
+    // قاعدة بيانات المحاكاة للشخصيات والتلميحات
+    hintsDB = [
+      {
+        character: "نيل أرمسترونغ",
+        hints: [
+          "أول إنسان مشى على سطح القمر",
+          "ولد في ولاية أوهايو الأمريكية",
+          "كان طياراً في البحرية الأمريكية",
+          "قال العبارة الشهيرة: 'هذه خطوة صغيرة للإنسان، قفزة عملاقة للبشرية'",
+          "توفي عام 2012 عن عمر 82 عاماً"
+        ]
+      },
+      {
+        character: "ألبرت أينشتاين",
+        hints: [
+          "عالم فيزياء نظرية ألماني",
+          "حائز على جائزة نوبل في الفيزياء",
+          "اشتهر بنظريتي النسبية الخاصة والعامة",
+          "صاحب معادلة تكافؤ المادة والطاقة E=mc²",
+          "اشتهر بشعره الأشعث ولعبه الكمان"
+        ]
+      },
+      {
+        character: "كليوباترا",
+        hints: [
+          "آخر حكام المملكة البطلمية في مصر",
+          "اشتهرت بعلاقاتها مع يوليوس قيصر ومارك أنطونيو",
+          "توفيت بلدغة أفعى (وفقاً للأسطورة)",
+          "تحدثت تسع لغات بطلاقة",
+          "كانت تعتبر تجسيداً للإلهة إيزيس"
+        ]
+      },
+      {
+        character: "ليونيل ميسي",
+        hints: [
+          "لاعب كرة قدم أرجنتيني",
+          "فاز بسبع كرات ذهبية",
+          "قاد الأرجنتين للفوز بكأس العالم 2022",
+          "لعب معظم مسيرته في نادي برشلونة",
+          "يُعتبر أحد أعظم لاعبي كرة القدم في التاريخ"
+        ]
+      }
+    ];
+
+    function createTeams() {
+      const count = +document.getElementById('teamCount').value;
+      const container = document.getElementById('teamInputs');
+      container.innerHTML = '';
+      container.classList.remove('hidden');
+      
+      teams = [];
+      for (let i = 0; i < count; i++) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h3 class="card-title">الفريق ${i+1}</h3>
+          <div class="input-group">
+            <label for="team${i+1}">اسم الفريق:</label>
+            <input type="text" id="team${i+1}" placeholder="اسم الفريق ${i+1}">
+          </div>
+        `;
+        container.appendChild(card);
+      }
+      
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-success';
+      btn.textContent = 'ابدأ اللعبة';
+      btn.onclick = startGame;
+      container.appendChild(btn);
     }
-    const btn = document.createElement('button'); btn.textContent='ابدأ اللعبة'; btn.onclick = startGame;
-    container.appendChild(btn);
-  }
 
-  function startGame() {
-    const inputs = document.querySelectorAll('#teamInputs input');
-    teams = Array.from(inputs).map(i=>i.value.trim()).filter(v=>v);
-    if (teams.length<2) return alert('أدخل أسماء فريقين على الأقل');
-    scores = teams.map(_=>0);
-    // تهيئة قائمة اختيار الفائز
-    const sel = document.getElementById('winnerSelect'); sel.innerHTML = teams.map(t=>`<option>${t}</option>`).join('');
-    document.getElementById('setup').style.display='none';
-    document.getElementById('gameArea').style.display='block';
-    newCharacter();
-    renderScores();
-  }
+    function startGame() {
+      const inputs = document.querySelectorAll('#teamInputs input');
+      teams = Array.from(inputs).map(i => i.value.trim()).filter(v => v);
+      if (teams.length < 2) return alert('أدخل أسماء فريقين على الأقل');
+      
+      scores = teams.map(_ => 0);
+      const sel = document.getElementById('winnerSelect');
+      sel.innerHTML = teams.map(t => `<option value="${t}">${t}</option>`).join('');
+      
+      document.getElementById('setup').classList.add('hidden');
+      document.getElementById('gameArea').classList.remove('hidden');
+      newCharacter();
+      renderScores();
+    }
 
-  function newCharacter() {
-    document.getElementById('nextBtn').style.display='none';
-    const idx = Math.floor(Math.random()*hintsDB.length);
-    currentCharacter = hintsDB[idx];
-    document.getElementById('characterName').textContent = currentCharacter.character;
-    const hintsList = document.getElementById('hints'); hintsList.innerHTML='';
-    currentCharacter.hints.slice(0,10).forEach(h=>{
-      const li = document.createElement('li'); li.textContent=h; hintsList.appendChild(li);
-    });
-  }
+    function newCharacter() {
+      document.getElementById('nextBtn').style.display = 'none';
+      const idx = Math.floor(Math.random() * hintsDB.length);
+      currentCharacter = hintsDB[idx];
+      
+      document.getElementById('characterName').textContent = currentCharacter.character;
+      const hintsList = document.getElementById('hints');
+      hintsList.innerHTML = '';
+      
+      currentCharacter.hints.slice(0, 10).forEach(h => {
+        const li = document.createElement('li');
+        li.textContent = h;
+        hintsList.appendChild(li);
+      });
+    }
 
-  function awardPoints() {
-    const winner = document.getElementById('winnerSelect').value;
-    const i = teams.indexOf(winner);
-    if (i>=0) scores[i]+=3;
-    renderScores();
-    document.getElementById('nextBtn').style.display='inline-block';
-  }
-  function penaltyAll() {
-    scores = scores.map(s=>s-1);
-    renderScores();
-    document.getElementById('nextBtn').style.display='inline-block';
-  }
-  function nextRound() {
-    newCharacter();
-  }
+    function awardPoints() {
+      const winner = document.getElementById('winnerSelect').value;
+      const i = teams.indexOf(winner);
+      if (i >= 0) scores[i] += 3;
+      
+      renderScores();
+      document.getElementById('nextBtn').style.display = 'inline-block';
+      showNotification(`تم منح 3 نقاط لفريق ${winner}!`);
+    }
+    
+    function penaltyAll() {
+      scores = scores.map(s => s - 1);
+      renderScores();
+      document.getElementById('nextBtn').style.display = 'inline-block';
+      showNotification(`تم خصم نقطة من جميع الفرق!`);
+    }
+    
+    function nextRound() {
+      newCharacter();
+    }
 
-  function renderScores() {
-    const rows = document.getElementById('scoreRows');
-    rows.innerHTML = teams.map((t,i)=>`<tr><td>${t}</td><td>${scores[i]}</td></tr>`).join('');
-  }
+    function renderScores() {
+      const rows = document.getElementById('scoreRows');
+      rows.innerHTML = teams.map((t, i) => `
+        <tr>
+          <td>${t}</td>
+          <td>${scores[i]}</td>
+        </tr>
+      `).join('');
+    }
 
-  let timerId;
-  function startTimer() {
-    clearInterval(timerId);
-    let time = +document.getElementById('timerInput').value;
-    const disp = document.getElementById('timerDisplay'); disp.textContent = time+'s';
-    timerId = setInterval(()=>{
-      time--; disp.textContent = time+'s';
-      if(time<=0) clearInterval(timerId);
-    },1000);
-  }
-</script></body>
+    let timerId;
+    function startTimer() {
+      clearInterval(timerId);
+      let time = +document.getElementById('timerInput').value;
+      const disp = document.getElementById('timerDisplay');
+      disp.textContent = time + 's';
+      disp.style.color = '#f39c12';
+      
+      timerId = setInterval(() => {
+        time--;
+        disp.textContent = time + 's';
+        
+        if (time <= 10) disp.style.color = '#e74c3c';
+        if (time <= 0) {
+          clearInterval(timerId);
+          showNotification("انتهى وقت الجولة!");
+        }
+      }, 1000);
+    }
+    
+    function showNotification(message) {
+      const notif = document.createElement('div');
+      notif.textContent = message;
+      notif.style.position = 'fixed';
+      notif.style.bottom = '20px';
+      notif.style.left = '50%';
+      notif.style.transform = 'translateX(-50%)';
+      notif.style.backgroundColor = '#2ecc71';
+      notif.style.color = 'white';
+      notif.style.padding = '15px 25px';
+      notif.style.borderRadius = '30px';
+      notif.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+      notif.style.zIndex = '1000';
+      notif.style.fontWeight = 'bold';
+      notif.style.animation = 'fadeIn 0.3s';
+      
+      document.body.appendChild(notif);
+      
+      setTimeout(() => {
+        notif.style.animation = 'fadeOut 0.5s';
+        setTimeout(() => document.body.removeChild(notif), 500);
+      }, 3000);
+    }
+  </script>
+</body>
 </html>
